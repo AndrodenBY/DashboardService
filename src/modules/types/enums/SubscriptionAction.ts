@@ -1,0 +1,1 @@
+export type SubscriptionAction = 1 | 2 | 3 | 4;
