@@ -1,1 +1,7 @@
-export type SubscriptionAction = 1 | 2 | 3 | 4;
+export enum SubscriptionAction{
+  None = 0,
+  Activate = 1,
+  Renew = 2,
+  Cancel = 3,
+  ChangeType = 4
+}
