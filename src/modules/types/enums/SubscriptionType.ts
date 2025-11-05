@@ -1,0 +1,10 @@
+export enum SubscriptionType {
+  None = 0,
+  Free = 1,
+  Lifetime = 2,
+  Enterprise = 3,
+  Trial = 4,
+  Family = 5,
+  Student = 6,
+  Standard = 7
+}
