@@ -1,10 +1,10 @@
 import {subscriptionApi} from './axios.ts';
-import type {SubscriptionFilterDto} from '../modules/filter/SubscriptionFilterDto.ts';
-import type {CreateSubscriptionDto} from '../modules/types/subscription/dto/CreateSubscriptionDto.ts';
-import type {UpdateSubscriptionDto} from '../modules/types/subscription/dto/UpdateSubscriptionDto.ts';
+import type {SubscriptionFilterDto} from '../../modules/filter/SubscriptionFilterDto.ts';
+import type {CreateSubscriptionDto} from '../../modules/types/subscription/dto/CreateSubscriptionDto.ts';
+import type {UpdateSubscriptionDto} from '../../modules/types/subscription/dto/UpdateSubscriptionDto.ts';
 import type {
   SubscriptionViewModel
-} from "../modules/types/subscription/view-model/subscription/SubscriptionViewModel.ts";
+} from "../../modules/types/subscription/view-model/subscription/SubscriptionViewModel.ts";
 
 export const subscriptionApiCalls = {
   getById: async (id: string): Promise<SubscriptionViewModel> => {

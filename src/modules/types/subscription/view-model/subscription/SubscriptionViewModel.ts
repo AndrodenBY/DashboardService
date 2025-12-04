@@ -1,5 +1,5 @@
-import type {SubscriptionType} from "../../enums/SubscriptionType.ts";
-import type {SubscriptionContent} from "../../enums/SubscriptionContent.ts";
+import type {SubscriptionType} from "../../../enums/SubscriptionType.ts";
+import type {SubscriptionContent} from "../../../enums/SubscriptionContent.ts";
 
 export type SubscriptionViewModel = {
   id: string;

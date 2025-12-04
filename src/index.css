@@ -70,3 +70,24 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.subscription-list{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #888888;
+  border-radius: 15px;
+  gap: 20px;
+
+}
+
+.subscription-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #888888;
+  gap: 20px;
+  padding: 30px;
+}
+

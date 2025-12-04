@@ -1,8 +1,8 @@
-import {userApi} from './axios';
-import type {UserViewModel} from "../modules/types/user/view-model/user/UserViewModel.ts";
-import type {CreateUserDto} from "../modules/types/user/dto/user/CreateUserDto.ts";
-import type {UpdateUserDto} from "../modules/types/user/dto/user/UpdateUserDto.ts";
-import type {UserFilterDto} from "../modules/filter/UserFilterDto.ts";
+import {userApi} from './axios.ts';
+import type {UserViewModel} from "../../modules/types/user/view-model/user/UserViewModel.ts";
+import type {CreateUserDto} from "../../modules/types/user/dto/user/CreateUserDto.ts";
+import type {UpdateUserDto} from "../../modules/types/user/dto/user/UpdateUserDto.ts";
+import type {UserFilterDto} from "../../modules/filter/UserFilterDto.ts";
 
 export const userApiCalls = {
   getById: async (id: string): Promise<UserViewModel> => {
