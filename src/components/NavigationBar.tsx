@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Stack,
   SwipeableDrawer,
   Toolbar,
   Typography
@@ -26,7 +25,7 @@ export function NavigationBar() {
   });
 
   const navItems = [
-    { label: 'About', path: '/about' },
+    { label: 'Profile', path: '/profile' },
     { label: 'Services', path: '/services' },
     { label: 'Contact', path: '/contact' }
   ];
@@ -84,14 +83,6 @@ export function NavigationBar() {
           >
             SubsTracker
           </Typography>
-
-          <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' } }}>
-            {navItems.map((item) => (
-              <Button key={item.label} component={NavLink} to={item.path} color="inherit">
-                {item.label}
-              </Button>
-            ))}
-          </Stack>
 
           <Button color="inherit">Login</Button>
         </Toolbar>

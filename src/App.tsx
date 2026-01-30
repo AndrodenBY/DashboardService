@@ -1,7 +1,8 @@
-import {Homepage} from "./ui/Homepage.tsx";
-import Counter from "./modules/Counter.tsx";
-import {subscriptionApiCalls} from "./api/calls/subscriptionApiCalls.ts";
-
+import {useEffect} from "react";
+import {injectAuthHeader} from "./api/calls/axios.ts";
+import * as React from "react";
+import {AppBar, Box, Container, IconButton, Toolbar, Typography, MenuIcon, Menu, MenuItem, Button} from "@mui/material";
+import {BrowserRouter} from "react-router-dom";
 
 function App() {
   // const [count, setCount] = React.useState(0);
@@ -29,4 +30,22 @@ function App() {
   );
 }
 
+// return (
+//   <BrowserRouter>
+//     <NavigationBar />
+//
+//     <Routes>
+//       <Route path="/" element={
+//         <Homepage>
+//           <Counter fetchMethod={() => subscriptionApiCalls.getAll()} title={"Records"}/>
+//         </Homepage>
+//       } />
+//
+//       <Route path="/profile" element={<UserProfile />} />
+//       <Route path="/services" element={"<ServicesPage />"} />
+//       <Route path="/contact" element={"<ContactPage />"} />
+//     </Routes>
+//   </BrowserRouter>
+// );
+}
 export default App;
