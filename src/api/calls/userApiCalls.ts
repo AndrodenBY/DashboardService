@@ -10,6 +10,16 @@ export const userApiCalls = {
     return data;
   },
 
+  getMe: async (): Promise<UserViewModel> => {
+    const { data } = await userApi.get<UserViewModel>('/me');
+    return data;
+  },
+
+  getByAuth0Id: async (auth0Id: string): Promise<UserViewModel> => {
+    const { data } = await userApi.get<UserViewModel>(`/${auth0Id}/me`);
+    return data;
+  },
+
   getAll: async (filter?: UserFilterDto): Promise<UserViewModel[]> => {
     const { data } = await userApi.get<UserViewModel[]>('', {
       params: filter,

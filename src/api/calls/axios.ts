@@ -7,7 +7,19 @@ export const userApi = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
+
+export const injectAuthHeader = (getAccessTokenSilently: () => Promise<string>) => {
+  userApi.interceptors.request.use(async (config) => {
+    try {
+      const token = await getAccessTokenSilently();
+      config.headers.Authorization = `Bearer ${token}`;
+    } catch (error) {
+      console.error("Auth0 token error", error);
+    }
+    return config;
+  });
+};
 
 export const groupApi = axios.create({
   baseURL: `${API_HOST_URL}/api/groups`,
@@ -22,3 +34,4 @@ export const subscriptionApi = axios.create({
     'Content-Type': 'application/json',
   }
 })
+
