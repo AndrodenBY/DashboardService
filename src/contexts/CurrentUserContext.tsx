@@ -93,26 +93,36 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
 
   const syncUser = useCallback(async () => {
     if (!isAuthenticated || !auth0User) {
-      setCurrentUser(null)
-      saveCurrentUser(null)
-      setIsLoading(false)
-      return
+      setCurrentUser(null);
+      saveCurrentUser(null);
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(true)
-    setError(null)
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const user = await ensureBackendUser(auth0User, getAccessTokenSilently)
-      setCurrentUser(user)
-      saveCurrentUser(user)
-    } catch (e) {
-      const message = e instanceof Error ? e.message :
-      setError(message)
-      setCurrentUser(null)
-      saveCurrentUser(null)
-    } finally {
-      setIsLoading(false)
+      if (auth0User.sub) {
+        const user = await ensureBackendUser(
+          auth0User as Required<typeof auth0User>,
+          getAccessTokenSilently
+        );
+        setCurrentUser(user);
+        saveCurrentUser(user);
+      }
     }
-  }, [isAuthenticated, auth0User, getAccessTokenSilently])
+    catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "An unexpected error occurred";
+
+      setError(message);
+      setCurrentUser(null);
+      saveCurrentUser(null);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, auth0User, getAccessTokenSilently]);
 
   useEffect(() => {
     void syncUser()
