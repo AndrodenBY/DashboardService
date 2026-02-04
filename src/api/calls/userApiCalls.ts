@@ -15,8 +15,12 @@ export const userApiCalls = {
     return data;
   },
 
-  getByAuth0Id: async (auth0Id: string): Promise<UserViewModel> => {
-    const { data } = await userApi.get<UserViewModel>(`/${auth0Id}/me`);
+  getByAuth0Id: async  (token: string): Promise<UserViewModel> => {
+    const { data } = await userApi.get<UserViewModel>(`/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return data;
   },
 
@@ -27,8 +31,12 @@ export const userApiCalls = {
     return data;
   },
 
-  create: async (dto: CreateUserDto): Promise<UserViewModel> => {
-    const { data } = await userApi.post<UserViewModel>('', dto);
+  create: async (dto: CreateUserDto, token: string): Promise<UserViewModel> => {
+    const { data } = await userApi.post<UserViewModel>('', dto, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return data;
   },
 

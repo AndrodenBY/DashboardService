@@ -1,11 +1,14 @@
 import {Box, Container, Typography} from '@mui/material'
 import type {ReactNode} from 'react'
+import {useAuth0} from "@auth0/auth0-react";
 
 interface HomepageProps {
   children?: ReactNode
 }
 
 export function Homepage({ children }: Readonly<HomepageProps>) {
+
+  const { user, isAuthenticated } = useAuth0();
 
   return (
     <div>
@@ -21,9 +24,10 @@ export function Homepage({ children }: Readonly<HomepageProps>) {
             borderColor: 'divider',
           }}
         >
-          <Typography variant="h3" component="h1" color="textPrimary" gutterBottom>
-            Hello, NO_NAME
+          {isAuthenticated && user && (<Typography variant="h3" component="h1" color="textPrimary" gutterBottom>
+            Hello, {user.name} :)
           </Typography>
+          )}
           <Typography variant="body1" color="text.secondary">
             You’re signed in. Your session is persisted so you stay logged in across reloads.
           </Typography>

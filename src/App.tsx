@@ -4,9 +4,42 @@ import {NavigationBar} from "./components/NavigationBar.tsx";
 import {Homepage} from "./pages/Homepage.tsx";
 import {UserProfile} from "./pages/UserProfile.tsx";
 import {Box, Container, Typography} from "@mui/material";
+import {userApiCalls} from "./api/calls/userApiCalls.ts";
+import {useEffect} from "react";
 
 function App() {
   const { isAuthenticated, isLoading, error } = useAuth0();
+
+  const { user, getAccessTokenSilently } = useAuth0();
+
+  useEffect(() => {
+    const syncUser = async () => {
+      if (isAuthenticated && user) {
+        try {
+          if (!user?.sub || !user?.email) {
+            console.error("Missing required user data");
+
+            return;
+          }
+
+          const token = await getAccessTokenSilently();
+
+          await userApiCalls.create({
+            auth0Id: user.sub,
+            email: user.email,
+            firstName: user.name ?? "NoName",
+          }, token);
+
+          const userData = await userApiCalls.getByAuth0Id(token);
+          console.log("Бэкенд ответил:", userData);
+        } catch (error) {
+          console.error("Sync error:", error);
+        }
+      }
+    };
+
+    syncUser();
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
   if (isLoading) {
     return (
