@@ -6,21 +6,47 @@ import {UserProfile} from "./pages/UserProfile.tsx";
 import {Box, Container, Typography} from "@mui/material";
 import {userApiCalls} from "./api/calls/userApiCalls.ts";
 import {useEffect} from "react";
+import {EditUserPage} from "./pages/EditUserPage.tsx";
 
 function App() {
-  const { isAuthenticated, isLoading, error } = useAuth0();
+  const {
+    isAuthenticated,
+    isLoading,
+    error,
+    user,
+    getAccessTokenSilently,
+    loginWithRedirect
+  } = useAuth0();
 
-  const { user, getAccessTokenSilently } = useAuth0();
+  useEffect(() => {
+    const handleRetry = async () => {
+      if (error && error.message === "Invalid state") {
+        console.warn("Detected Invalid State. Attempting seamless retry...");
+
+        const retryCount = parseInt(sessionStorage.getItem("auth_retries") || "0");
+
+        if (retryCount < 2) {
+          sessionStorage.setItem("auth_retries", (retryCount + 1).toString());
+
+          try {
+            await loginWithRedirect();
+          } catch (loginError) {
+            console.error("Failed to redirect for retry:", loginError);
+          }
+        }
+      } else if (isAuthenticated) {
+        sessionStorage.removeItem("auth_retries");
+      }
+    };
+
+    void handleRetry();
+  }, [error, isAuthenticated, loginWithRedirect]);
 
   useEffect(() => {
     const syncUser = async () => {
       if (isAuthenticated && user) {
         try {
-          if (!user?.sub || !user?.email) {
-            console.error("Missing required user data");
-
-            return;
-          }
+          if (!user?.sub || !user?.email) return;
 
           const token = await getAccessTokenSilently();
 
@@ -31,9 +57,9 @@ function App() {
           }, token);
 
           const userData = await userApiCalls.getByAuth0Id(token);
-          console.log("Бэкенд ответил:", userData);
-        } catch (error) {
-          console.error("Sync error:", error);
+          console.log("Synced with backend:", userData);
+        } catch (syncError) {
+          console.error("Sync error:", syncError);
         }
       }
     };
@@ -79,6 +105,7 @@ function App() {
         <Route path="/profile" element={
             <UserProfile />
         } />
+        <Route path="/profile/edit" element={<EditUserPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

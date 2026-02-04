@@ -14,9 +14,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import EmailIcon from '@mui/icons-material/Email';
 import BadgeIcon from '@mui/icons-material/Badge';
 import {useAuth0} from "@auth0/auth0-react";
+import {useNavigate} from "react-router-dom";
 
 export function UserProfile() {
   const { user, isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -95,7 +97,7 @@ export function UserProfile() {
             <IconButton
               color="primary"
               sx={{ border: '1px solid', borderColor: 'primary.light' }}
-              onClick={() => alert("Edit clicked!")}
+              onClick={() => navigate("/profile/edit")}
             >
               <EditIcon />
             </IconButton>
