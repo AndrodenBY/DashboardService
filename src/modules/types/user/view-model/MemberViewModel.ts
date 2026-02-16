@@ -1,4 +1,4 @@
-import type {MemberRole} from "../../../enums/MemberRole.ts";
+import type {MemberRole} from "../../enums/MemberRole.ts";
 
 export type MemberViewModel = {
   id: string;

@@ -1,6 +1,6 @@
 export type UpdateUserDto = {
-  id: string;
-  firstName?: string;
+
+  firstName: string;
   lastName?: string;
   email?: string;
 }
