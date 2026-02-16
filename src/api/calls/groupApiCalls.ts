@@ -1,7 +1,7 @@
 import {groupApi} from "./axios.ts";
-import type {GroupViewModel} from "../../modules/types/user/view-model/group/GroupViewModel.ts";
+import type {GroupViewModel} from "../../modules/types/user/view-model/GroupViewModel.ts";
 import type {GroupFilterDto} from "../../modules/filter/GroupFilterDto.ts";
-import type {MemberViewModel} from "../../modules/types/user/view-model/member/MemberViewModel.ts";
+import type {MemberViewModel} from "../../modules/types/user/view-model/MemberViewModel.ts";
 import type {MemberFilterDto} from "../../modules/filter/MemberFilterDto.ts";
 import type {CreateGroupDto} from "../../modules/types/user/dto/group/CreateGroupDto.ts";
 import type {UpdateGroupDto} from "../../modules/types/user/dto/group/UpdateGroupDto.ts";

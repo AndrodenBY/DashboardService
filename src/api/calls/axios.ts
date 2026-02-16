@@ -1,37 +1,76 @@
-import axios from 'axios';
+import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
 
-const API_HOST_URL = 'http://localhost:8080';
+const DOCKER_URL = 'http://localhost:8080';
+const LOCAL_URL = 'https://localhost:7089';
+
+interface RetryConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 export const userApi = axios.create({
-  baseURL: `${API_HOST_URL}/api/users`,
+  baseURL: `${DOCKER_URL}/api/users`,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-export const injectAuthHeader = (getAccessTokenSilently: () => Promise<string>) => {
-  userApi.interceptors.request.use(async (config) => {
-    try {
-      const token = await getAccessTokenSilently();
-      config.headers.Authorization = `Bearer ${token}`;
-    } catch (error) {
-      console.error("Auth0 token error", error);
-    }
-    return config;
-  });
-};
-
 export const groupApi = axios.create({
-  baseURL: `${API_HOST_URL}/api/groups`,
+  baseURL: `${DOCKER_URL}/api/groups`,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const subscriptionApi = axios.create({
-  baseURL: `${API_HOST_URL}/api/subscriptions`,
+  baseURL: `${DOCKER_URL}/api/subscriptions`,
   headers: {
     'Content-Type': 'application/json',
   }
 })
 
+export const apiInterceptors = (getAccessToken: () => Promise<string>) => {
+
+  const addToken = async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+    try {
+      const token = await getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error("Token interceptor error", error);
+    }
+    return config;
+  };
+
+  const failoverInterceptor = async (error: AxiosError): Promise<AxiosResponse> => {
+    const config = error.config as RetryConfig;
+
+    if (!error.response && config && !config._retry) {
+      config._retry = true;
+
+      if (config.baseURL) {
+        config.baseURL = config.baseURL.replace(DOCKER_URL, LOCAL_URL);
+      }
+
+      console.warn(
+        `%c[Failover] Primary API unreachable. Retrying with: ${config.baseURL}`,
+        'color: orange; font-weight: bold;'
+      );
+      return axios({
+        ...config,
+        headers: config.headers
+      });
+    }
+
+    return Promise.reject(error);
+  };
+
+  const apis = [userApi, groupApi, subscriptionApi, axios];
+
+  apis.forEach((api) => {
+    api.interceptors.request.use(addToken);
+    if (api !== axios) {
+      api.interceptors.response.use((response) => response, failoverInterceptor);
+    }
+  });
+};
