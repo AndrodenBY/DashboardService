@@ -3,31 +3,30 @@ import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import {NavigationBar} from "./components/NavigationBar.tsx";
 import {Homepage} from "./pages/Homepage.tsx";
 import {UserProfile} from "./pages/UserProfile.tsx";
-import {Box, Container, Typography} from "@mui/material";
-import {userApiCalls} from "./api/calls/userApiCalls.ts";
+import {Box, CircularProgress, Container, Typography} from "@mui/material";
 import {useEffect} from "react";
 import {EditUserPage} from "./pages/EditUserPage.tsx";
+import {AddSubscriptionPage} from "./pages/AddSubscriptionPage.tsx";
+import {useUser} from "./modules/useUser.ts"
 
 function App() {
   const {
     isAuthenticated,
-    isLoading,
+    isLoading: isAuthLoading,
     error,
-    user,
-    getAccessTokenSilently,
     loginWithRedirect
   } = useAuth0();
+
+  const { isSyncing } = useUser();
 
   useEffect(() => {
     const handleRetry = async () => {
       if (error && error.message === "Invalid state") {
         console.warn("Detected Invalid State. Attempting seamless retry...");
-
         const retryCount = parseInt(sessionStorage.getItem("auth_retries") || "0");
 
         if (retryCount < 2) {
           sessionStorage.setItem("auth_retries", (retryCount + 1).toString());
-
           try {
             await loginWithRedirect();
           } catch (loginError) {
@@ -42,35 +41,16 @@ function App() {
     void handleRetry();
   }, [error, isAuthenticated, loginWithRedirect]);
 
-  useEffect(() => {
-    const syncUser = async () => {
-      if (isAuthenticated && user) {
-        try {
-          if (!user?.sub || !user?.email) return;
-
-          const token = await getAccessTokenSilently();
-
-          await userApiCalls.create({
-            auth0Id: user.sub,
-            email: user.email,
-            firstName: user.name ?? "NoName",
-          }, token);
-
-          const userData = await userApiCalls.getByAuth0Id(token);
-          console.log("Synced with backend:", userData);
-        } catch (syncError) {
-          console.error("Sync error:", syncError);
-        }
-      }
-    };
-
-    syncUser();
-  }, [isAuthenticated, user, getAccessTokenSilently]);
-
-  if (isLoading) {
+  if (isAuthLoading || (isAuthenticated && isSyncing)) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Typography variant="h6">Syncing Authentication...</Typography>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        flexDirection: 'column'
+      }}>
+        <CircularProgress sx={{ mb: 2 }} />
       </Box>
     );
   }
@@ -78,8 +58,8 @@ function App() {
   if (error) {
     return (
       <Container sx={{ textAlign: 'center', mt: 10 }}>
-        <Typography variant="h4" color="error">The error has occurred when loading a user. Look at the error type below </Typography>
-        <Typography>{error.message}</Typography>
+        <Typography variant="h4" color="error">Authentication Error</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>{error.message}</Typography>
       </Container>
     );
   }
@@ -90,22 +70,20 @@ function App() {
       <Routes>
         <Route path="/" element={
           isAuthenticated ? (
-              <Homepage>
-                <Typography variant="body1" sx={{ textAlign: 'center' }}>
-                  Welcome to your dashboard. Start managing your subscriptions below.
-                </Typography>
-              </Homepage>
+            <Homepage />
           ) : (
             <Container sx={{ textAlign: 'center', mt: 10 }}>
               <Typography variant="h4" gutterBottom>Welcome to SubsTracker</Typography>
-              <Typography variant="body1" sx={{ mb: 4 }}>Please log in to manage your subscriptions.</Typography>
+              <Typography variant="body1" sx={{ mb: 4 }}>
+                Please log in to manage your subscriptions.
+              </Typography>
             </Container>
           )
         } />
-        <Route path="/profile" element={
-            <UserProfile />
-        } />
+
+        <Route path="/profile" element={<UserProfile />} />
         <Route path="/profile/edit" element={<EditUserPage />} />
+        <Route path="/subscriptions/add" element={<AddSubscriptionPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

@@ -1,26 +1,42 @@
-import {
-  Avatar,
-  Box,
-  CardContent,
-  CircularProgress,
-  Container,
-  Divider,
-  IconButton,
-  Paper,
-  Stack,
-  Typography
-} from '@mui/material';
+import {Avatar, Box, Button, Card, CircularProgress, Container, Divider, Grid, Typography,} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import EmailIcon from '@mui/icons-material/Email';
-import BadgeIcon from '@mui/icons-material/Badge';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import {useAuth0} from "@auth0/auth0-react";
 import {useNavigate} from "react-router-dom";
+import {useEffect, useState} from 'react';
+import {userApiCalls} from '../api/calls/userApiCalls';
+import {subscriptionApiCalls} from '../api/calls/subscriptionApiCalls';
+import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
 export function UserProfile() {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth0();
   const navigate = useNavigate();
 
-  if (isLoading) {
+  const [subscriptions, setSubscriptions] = useState<SubscriptionViewModel[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!isAuthenticated) return;
+      setIsDataLoading(true);
+      try {
+        const internalUser = await userApiCalls.getByAuth0Id();
+        const userSubscriptions = await subscriptionApiCalls.getAll({
+          userId: internalUser.id
+        });
+        setSubscriptions(userSubscriptions);
+      } catch (err) {
+        console.error("Failed to load profile stats:", err);
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    void fetchProfileData();
+  }, [isAuthenticated]);
+
+  if (authLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
         <CircularProgress />
@@ -31,79 +47,93 @@ export function UserProfile() {
   if (!isAuthenticated || !user) return null;
 
   const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
+  const totalCost = subscriptions.reduce((sum, sub) => sum + sub.price, 0);
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ borderRadius: 4, overflow: 'hidden' }}>
+    <Container maxWidth="md" sx={{ py: 8 }}>
 
-        <Box sx={{ height: 100, bgcolor: 'primary.main' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 4, mb: 6 }}>
+        <Avatar
+          src={user.picture}
+          sx={{
+            width: 100, height: 100,
+            bgcolor: 'primary.main',
+            fontSize: '2.5rem',
+          }}
+        >
+          {initials}
+        </Avatar>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: -6 }}>
-          <Avatar
-            src={user.picture}
-            sx={{
-              width: 110, height: 110,
-              bgcolor: 'secondary.main',
-              fontSize: '2.5rem',
-              border: '4px solid white',
-              boxShadow: 2
-            }}
-          >
-            {initials}
-          </Avatar>
-
-          <Typography variant="h5" sx={{ mt: 2, fontWeight: 'bold' }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h5" fontWeight="bold">
             {user.name}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5 }}>
+            {user.email}
+          </Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace' }}>
             ID: {user.sub}
           </Typography>
         </Box>
 
-        <CardContent sx={{ px: 4, py: 3 }}>
-          <Stack spacing={3}>
-            <Divider>
-              <Typography variant="overline" color="text.secondary">
-                Details
-              </Typography>
-            </Divider>
+        <Button
+          variant="outlined"
+          startIcon={<EditIcon />}
+          onClick={() => navigate("/profile/edit")}
+        >
+          Edit Profile
+        </Button>
+      </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <BadgeIcon color="primary" />
+      <Divider sx={{ mb: 6 }} />
+
+      <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Subscriptions Overview
+      </Typography>
+
+      {isDataLoading ? (
+        <Box sx={{ display: 'flex', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card variant="outlined" sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 2 }}>
+              <Avatar sx={{ bgcolor: 'primary.light', width: 56, height: 56 }}>
+                <FormatListBulletedIcon color="primary" />
+              </Avatar>
               <Box>
-                <Typography variant="caption" display="block" color="text.secondary">
-                  Full Name
+                <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Active Subscriptions
                 </Typography>
-                <Typography variant="body1">
-                  {user.name}
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {subscriptions.length}
                 </Typography>
               </Box>
-            </Box>
+            </Card>
+          </Grid>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <EmailIcon color="action" />
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card variant="outlined" sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 2 }}>
+              <Avatar sx={{ bgcolor: 'error.light', width: 56, height: 56 }}>
+                <AccountBalanceWalletIcon color="error" />
+              </Avatar>
               <Box>
-                <Typography variant="caption" display="block" color="text.secondary">
-                  Email Address
+                <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Total Monthly Cost
                 </Typography>
-                <Typography variant="body1">
-                  {user.email}
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'error.main' }}>
+                  ${totalCost.toFixed(2)}
                 </Typography>
               </Box>
-            </Box>
-          </Stack>
+            </Card>
+          </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-            <IconButton
-              color="primary"
-              sx={{ border: '1px solid', borderColor: 'primary.light' }}
-              onClick={() => navigate("/profile/edit")}
-            >
-              <EditIcon />
-            </IconButton>
-          </Box>
-        </CardContent>
-      </Paper>
+        </Grid>
+      )}
+
     </Container>
   );
 }
