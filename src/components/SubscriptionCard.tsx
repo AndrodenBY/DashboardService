@@ -1,34 +1,53 @@
-import {SubscriptionType} from "../modules/types/enums/SubscriptionType.ts";
-import {SubscriptionContent} from "../modules/types/enums/SubscriptionContent.ts";
-import {Card, CardContent, Divider, Stack, Typography} from "@mui/material";
+import {Box, Card, CardContent, Chip, Divider, Stack, Typography} from "@mui/material";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
-type StartPageProps = {
-  subscriptionName: string;
-  subscriptionType: SubscriptionType;
-  subscriptionContent: SubscriptionContent;
-};
+type SubscriptionCardProps = {subscriptionInfo: SubscriptionViewModel};
 
-export function SubscriptionCard ({subscriptionName, subscriptionType, subscriptionContent}: StartPageProps) {
+export function SubscriptionCard({ subscriptionInfo }: Readonly<SubscriptionCardProps>) {
+
+  const formattedDate = new Date(subscriptionInfo.dueDate).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 
   return (
-      <Card variant="outlined">
-        <Stack direction="row" sx={{justifyContent: 'space-between', alignItems: 'center', padding: '10px'}}>
-          <Typography gutterBottom variant="h4" component="div">
-            {subscriptionName}
+    <Card variant="outlined" sx={{ '&:hover': { boxShadow: 3 }, transition: '0.2s' }}>
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
+        <Box>
+          <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+            {subscriptionInfo.name}
           </Typography>
-          <Typography gutterBottom component="div" sx={{color: 'text.secondary'}}>
-            {subscriptionType}
+          <Typography variant="body2" color="text.secondary">
+            {subscriptionInfo.content}
           </Typography>
-        </Stack>
-        <Divider />
-        <CardContent>
-          <Stack direction="column" spacing={1}>
-            <Typography variant="body2" sx={{color: 'text.secondary'}}>Type of content: {subscriptionContent}</Typography>
+        </Box>
+
+        <Typography variant="h5" color="primary.main" sx={{ fontWeight: 'bold' }}>
+          ${(subscriptionInfo.price || 0).toFixed(2)}
+        </Typography>
+      </Stack>
+
+      <Divider />
+
+      <CardContent sx={{ '&:last-child': { pb: 2 }, pt: 2 }}>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Chip
+            label={subscriptionInfo.type}
+            size="small"
+            color="secondary"
+            variant="outlined"
+          />
+
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'text.secondary' }}>
+            <CalendarTodayIcon fontSize="small" />
+            <Typography variant="body2">
+              Next bill: {formattedDate}
+            </Typography>
           </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 }
-
-
-

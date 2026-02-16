@@ -1,25 +1,21 @@
-import {SubscriptionType} from "../modules/types/enums/SubscriptionType.ts";
-import {SubscriptionContent} from "../modules/types/enums/SubscriptionContent.ts";
 import {SubscriptionCard} from "./SubscriptionCard.tsx";
+import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
 type SubscriptionListProps = {
-  subscriptionName: string;
-  subscriptionType: SubscriptionType;
-  subscriptionContent: SubscriptionContent;
+  subscriptions: SubscriptionViewModel[];
 };
 
-
-export function SubscriptionList ({subscriptionName, subscriptionType, subscriptionContent}: SubscriptionListProps) {
+export function SubscriptionList({ subscriptions }: Readonly<SubscriptionListProps>) {
   return (
     <section className="subscription-list-section">
-      <ul className="subscription-list">
-          <li>
+      <ul className="subscription-list" style={{ listStyleType: 'none', padding: 0 }}>
+        {subscriptions.map((subscription) => (
+          <li key={subscription.id} style={{ marginBottom: '16px' }}>
             <SubscriptionCard
-              subscriptionName = {subscriptionName}
-              subscriptionType = {subscriptionType}
-              subscriptionContent = {subscriptionContent}
+              subscriptionInfo={subscription}
             />
           </li>
+        ))}
       </ul>
     </section>
   );
