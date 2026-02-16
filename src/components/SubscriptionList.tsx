@@ -1,4 +1,5 @@
 import {SubscriptionCard} from "./SubscriptionCard.tsx";
+import {Stack} from "@mui/material";
 import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
 type SubscriptionListProps = {
@@ -8,15 +9,14 @@ type SubscriptionListProps = {
 export function SubscriptionList({ subscriptions }: Readonly<SubscriptionListProps>) {
   return (
     <section className="subscription-list-section">
-      <ul className="subscription-list" style={{ listStyleType: 'none', padding: 0 }}>
+      <Stack spacing={3}>
         {subscriptions.map((subscription) => (
-          <li key={subscription.id} style={{ marginBottom: '16px' }}>
-            <SubscriptionCard
-              subscriptionInfo={subscription}
-            />
-          </li>
+          <SubscriptionCard
+            key={subscription.id}
+            subscriptionInfo={subscription}
+          />
         ))}
-      </ul>
+      </Stack>
     </section>
   );
 }

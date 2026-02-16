@@ -1,4 +1,4 @@
-import {Box, Button, CircularProgress, Container, Stack, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Container, Divider, Stack, Typography} from '@mui/material';
 import {type ReactNode, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {subscriptionApiCalls} from '../api/calls/subscriptionApiCalls';
@@ -72,34 +72,59 @@ export function Homepage({children}: Readonly<HomepageProps> ) {
 
       <Box sx={{ my: 3, textAlign: 'center' }}>{children}</Box>
 
-      <Stack direction="row" spacing={2} sx={{ mb: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Box sx={{ minWidth: 200 }}>
-          {currentUser && (
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{
+          mb: 3,
+          px: 2,
+          py: 1,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+          backgroundColor: 'background.paper',
+        }}
+      >
+        {currentUser && (
+          <Stack direction="row" alignItems="center" spacing={2}>
+
             <Counter
-              fetchMethod={() => subscriptionApiCalls.getAll({ userId: currentUser.id })}
-              title="Total Subscriptions"
+              fetchMethod={() =>
+                subscriptionApiCalls.getAll({ userId: currentUser.id })
+              }
+              title="subs"
             />
-          )}
-        </Box>
+
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ borderColor: 'divider', mx: 1 }}
+            />
+          </Stack>
+        )}
+
 
         <Button
           variant="contained"
-          color="primary"
           size="large"
+          sx={{
+            px: 4,
+            minWidth: 140,
+            fontWeight: 'bold'
+          }}
           onClick={() => navigate('/subscriptions/add')}
         >
           + Add Subscription
         </Button>
       </Stack>
 
-      <Box sx={{ my: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Your Subscriptions
-        </Typography>
 
+      <Box sx={{ my: 3 }}>
         {isLoading ? (
           <CircularProgress />
-        ) : subscriptions.length > 0 ? (
+        ) : subscriptions.length > 0
+          ? (
           <SubscriptionList subscriptions={subscriptions} />
         ) : (
           <Typography variant="body1" color="text.secondary">
