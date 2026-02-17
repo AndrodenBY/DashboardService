@@ -2,10 +2,12 @@ import {Box, Button, CircularProgress, Container, Divider, Stack, Typography} fr
 import {type ReactNode, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {subscriptionApiCalls} from '../api/calls/subscriptionApiCalls';
-import type {SubscriptionViewModel} from '../modules/types/subscription/view-model/SubscriptionViewModel.ts';
 import Counter from "../modules/Counter.tsx";
 import {SubscriptionList} from "../components/SubscriptionList.tsx";
 import {useUser} from "../modules/useUser.ts";
+import type {
+  SubscriptionViewModel as Subscription
+} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts"
 
 interface HomepageProps {
   children?: ReactNode;
@@ -15,7 +17,7 @@ export function Homepage({children}: Readonly<HomepageProps> ) {
   const { currentUser, isSyncing } = useUser();
   const navigate = useNavigate();
 
-  const [subscriptions, setSubscriptions] = useState<SubscriptionViewModel[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export function Homepage({children}: Readonly<HomepageProps> ) {
         const userSubscriptions = await subscriptionApiCalls.getAll({
           userId: currentUser.id
         });
-        setSubscriptions(userSubscriptions);
+        setSubscriptions(userSubscriptions.items);
       } catch (err) {
         console.error("Failed to load dashboard data:", err);
       } finally {
@@ -90,10 +92,11 @@ export function Homepage({children}: Readonly<HomepageProps> ) {
           <Stack direction="row" alignItems="center" spacing={2}>
 
             <Counter
-              fetchMethod={() =>
-                subscriptionApiCalls.getAll({ userId: currentUser.id })
-              }
-              title="subs"
+              fetchMethod={async () => {
+                const response = await subscriptionApiCalls.getAll({ userId: currentUser.id })
+                return response.items;
+              }}
+              title="Subscriptions"
             />
 
             <Divider
@@ -103,7 +106,6 @@ export function Homepage({children}: Readonly<HomepageProps> ) {
             />
           </Stack>
         )}
-
 
         <Button
           variant="contained"

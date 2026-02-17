@@ -8,4 +8,5 @@ export type SubscriptionViewModel = {
   dueDate: string;
   type: SubscriptionType;
   content: SubscriptionContent;
+  active: boolean;
 }

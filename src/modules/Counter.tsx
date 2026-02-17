@@ -29,7 +29,7 @@ function Counter({ fetchMethod, title }: Readonly<CounterProps>) {
         py: 2,
         borderRadius: 4,
         bgcolor: alpha(theme.palette.primary.main, 0.01),
-        display: 'inline-block', // Shrinks card to content width
+        display: 'inline-block',
         minWidth: 'fit-content'
       }}
     >

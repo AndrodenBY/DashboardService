@@ -7,7 +7,6 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from 'react';
 import {userApiCalls} from '../api/calls/userApiCalls';
 import {subscriptionApiCalls} from '../api/calls/subscriptionApiCalls';
-import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
 export function UserProfile() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth0();
@@ -25,7 +24,7 @@ export function UserProfile() {
         const userSubscriptions = await subscriptionApiCalls.getAll({
           userId: internalUser.id
         });
-        setSubscriptions(userSubscriptions);
+        setSubscriptions(userSubscriptions.items);
       } catch (err) {
         console.error("Failed to load profile stats:", err);
       } finally {

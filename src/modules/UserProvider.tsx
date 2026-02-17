@@ -20,7 +20,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
         setIsSyncing(false);
         return;
       }
-      
+
       try {
         if (!interceptorsAttached.current) {
           apiInterceptors(getAccessTokenSilently);
@@ -30,6 +30,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
         console.log("Syncing user from DB...");
         const dbUser = await userApiCalls.getByAuth0Id();
         setCurrentUser(dbUser);
+        console.log("User synced successfully");
       } catch (err: unknown) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404 && user) {
@@ -40,6 +41,7 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
               firstName: user.given_name || user.name || "User",
             });
             setCurrentUser(newUser);
+            console.log("New user created and synced");
           }
         } else {
           console.error("An unexpected non-network error occurred:", err);

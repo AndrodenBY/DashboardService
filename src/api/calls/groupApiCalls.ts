@@ -6,6 +6,8 @@ import type {MemberFilterDto} from "../../modules/filter/MemberFilterDto.ts";
 import type {CreateGroupDto} from "../../modules/types/user/dto/group/CreateGroupDto.ts";
 import type {UpdateGroupDto} from "../../modules/types/user/dto/group/UpdateGroupDto.ts";
 import type {CreateMemberDto} from "../../modules/types/user/dto/member/CreateMemberDto.ts";
+import type {PaginationParameters} from "../../modules/types/pagination/PaginationParameters.ts";
+import type {PaginatedList} from "../../modules/types/pagination/PaginatedList.ts";
 
 export const groupApiCalls = {
   getById: async (id: string): Promise<GroupViewModel> => {
@@ -13,27 +15,33 @@ export const groupApiCalls = {
     return data;
   },
 
-  getAll: async (filter?: GroupFilterDto) : Promise<GroupViewModel[]> => {
-    const { data } = await groupApi.get<GroupViewModel[]>(``, {
-      params: filter,
+  getAll: async (
+    filter?: GroupFilterDto,
+    pagination?: PaginationParameters
+  ): Promise<PaginatedList<GroupViewModel>> => {
+    const { data } = await groupApi.get<PaginatedList<GroupViewModel>>('', {
+      params: { ...filter, ...pagination },
     });
     return data;
   },
 
-  getAllMembers: async (filter?: MemberFilterDto) : Promise<MemberViewModel[]> => {
-    const { data } = await groupApi.get<MemberViewModel[]>(``, {
-      params: filter,
+  getAllMembers: async (
+    filter?: MemberFilterDto,
+    pagination?: PaginationParameters
+  ): Promise<PaginatedList<MemberViewModel>> => {
+    const { data } = await groupApi.get<PaginatedList<MemberViewModel>>('/members', {
+      params: { ...filter, ...pagination },
     });
     return data;
   },
 
-  create: async (userId: string, dto: CreateGroupDto): Promise<GroupViewModel> => {
-    const { data } = await groupApi.post<GroupViewModel>(`${userId}/create`, dto);
+  create: async (dto: CreateGroupDto): Promise<GroupViewModel> => {
+    const { data } = await groupApi.post<GroupViewModel>('', dto);
     return data;
   },
 
   update: async (id: string, dto: UpdateGroupDto): Promise<GroupViewModel> => {
-    const { data } = await groupApi.put(`/${id}`, dto);
+    const { data } = await groupApi.put<GroupViewModel>(`/${id}`, dto);
     return data;
   },
 
@@ -41,33 +49,32 @@ export const groupApiCalls = {
     await groupApi.delete(`/${id}`);
   },
 
-  joinGroup: async (dto: CreateMemberDto): Promise<void> => {
-    const { data } = await groupApi.post(`/join`, dto);
-    return data;
+  join: async (dto: CreateMemberDto): Promise<void> => {
+    await groupApi.post('/join', dto);
   },
 
-  leaveGroup: async (groupId: string, userId: string): Promise<void> => {
-    await groupApi.delete(`/leave`, {
-      params: {groupId, userId}
+  leave: async (groupId: string, userId: string): Promise<void> => {
+    await groupApi.delete('/leave', {
+      params: { groupId, userId },
     });
   },
 
-  changeRole: async (memberId: string): Promise<MemberViewModel> => {
-    const { data } = await groupApi.patch(`/members/${memberId}/role`);
+  changeMemberRole: async (memberId: string): Promise<MemberViewModel> => {
+    const { data } = await groupApi.patch<MemberViewModel>(`/members/${memberId}/role`);
     return data;
   },
 
   shareSubscription: async (groupId: string, subscriptionId: string): Promise<GroupViewModel> => {
-    const { data } = await groupApi.post(`/share`, null, {
-      params: { groupId, subscriptionId }
+    const { data } = await groupApi.post<GroupViewModel>('/share', null, {
+      params: { groupId, subscriptionId },
     });
     return data;
   },
 
   unshareSubscription: async (groupId: string, subscriptionId: string): Promise<GroupViewModel> => {
-    const { data } = await groupApi.post(`/unshare`, null, {
-      params: { groupId, subscriptionId }
+    const { data } = await groupApi.post<GroupViewModel>('/unshare', null, {
+      params: { groupId, subscriptionId },
     });
     return data;
   },
-}
+};

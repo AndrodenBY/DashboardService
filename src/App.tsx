@@ -8,6 +8,7 @@ import {useEffect} from "react";
 import {EditUserPage} from "./pages/EditUserPage.tsx";
 import {AddSubscriptionPage} from "./pages/AddSubscriptionPage.tsx";
 import {useUser} from "./modules/useUser.ts"
+import {SubscriptionDetails} from "./pages/SubscriptionDetails.tsx"
 
 function App() {
   const {
@@ -84,6 +85,7 @@ function App() {
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/profile/edit" element={<EditUserPage />} />
         <Route path="/subscriptions/add" element={<AddSubscriptionPage />} />
+        <Route path="/subscriptions/:id" element={<SubscriptionDetails />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

@@ -3,6 +3,8 @@ import type {UserViewModel} from "../../modules/types/user/view-model/UserViewMo
 import type {CreateUserDto} from "../../modules/types/user/dto/user/CreateUserDto.ts";
 import type {UpdateUserDto} from "../../modules/types/user/dto/user/UpdateUserDto.ts";
 import type {UserFilterDto} from "../../modules/filter/UserFilterDto.ts";
+import type {PaginationParameters} from "../../modules/types/pagination/PaginationParameters.ts";
+import type {PaginatedList} from "../../modules/types/pagination/PaginatedList.ts";
 
 export const userApiCalls = {
   getById: async (id: string): Promise<UserViewModel> => {
@@ -10,14 +12,17 @@ export const userApiCalls = {
     return data;
   },
 
-  getByAuth0Id: async  (): Promise<UserViewModel> => {
+  getByAuth0Id: async (): Promise<UserViewModel> => {
     const { data } = await userApi.get<UserViewModel>(`/me`);
     return data;
   },
 
-  getAll: async (filter?: UserFilterDto): Promise<UserViewModel[]> => {
-    const { data } = await userApi.get<UserViewModel[]>('', {
-      params: filter,
+  getAll: async (
+    filter?: UserFilterDto,
+    pagination?: PaginationParameters
+  ): Promise<PaginatedList<UserViewModel>> => {
+    const { data } = await userApi.get<PaginatedList<UserViewModel>>('', {
+      params: { ...filter, ...pagination },
     });
     return data;
   },

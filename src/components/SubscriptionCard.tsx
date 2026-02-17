@@ -2,9 +2,12 @@ import {Box, Card, CardContent, Chip, Divider, Stack, Typography} from "@mui/mat
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import type {SubscriptionViewModel} from "../modules/types/subscription/view-model/SubscriptionViewModel.ts";
 
-type SubscriptionCardProps = {subscriptionInfo: SubscriptionViewModel};
+type SubscriptionCardProps = {
+  subscriptionInfo: SubscriptionViewModel;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+};
 
-export function SubscriptionCard({ subscriptionInfo }: Readonly<SubscriptionCardProps>) {
+export function SubscriptionCard({ subscriptionInfo, onClick }: Readonly<SubscriptionCardProps>) {
 
   const formattedDate = new Date(subscriptionInfo.dueDate).toLocaleDateString(undefined, {
     year: 'numeric',
@@ -13,7 +16,7 @@ export function SubscriptionCard({ subscriptionInfo }: Readonly<SubscriptionCard
   });
 
   return (
-    <Card variant="outlined" sx={{ '&:hover': { boxShadow: 3 }, transition: '0.2s' }}>
+    <Card onClick={onClick} variant="outlined" sx={{ '&:hover': { boxShadow: 3 }, transition: '0.2s' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
         <Box>
           <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>

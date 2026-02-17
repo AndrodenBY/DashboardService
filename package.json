@@ -15,8 +15,10 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
+    "@mui/x-date-pickers": "^8.27.0",
     "@types/auth0": "^3.3.11",
     "axios": "^1.13.1",
+    "dayjs": "^1.11.19",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.13.0"
