@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {alpha, Box, Card, Stack, Typography, useTheme} from "@mui/material";
 
-interface CounterProps {
+type CounterProps = {
   fetchMethod: () => Promise<unknown[]>;
   title: string;
 }

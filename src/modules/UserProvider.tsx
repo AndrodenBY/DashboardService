@@ -1,15 +1,21 @@
 import {type ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
+import axios from "axios";
 import {userApiCalls} from '../api/calls/userApiCalls';
 import {apiInterceptors} from '../api/calls/axios';
+import {UserContext} from "./UserContext";
 import type {UserViewModel} from "./types/user/view-model/UserViewModel.ts";
-import axios from "axios";
-import {UserContext} from "./UserContext.ts";
 
 export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const { isAuthenticated, isLoading: authLoading, user, getAccessTokenSilently } = useAuth0();
+  const {
+    isAuthenticated,
+    isLoading: authLoading,
+    user,
+    getAccessTokenSilently
+  } = useAuth0();
+
   const [currentUser, setCurrentUser] = useState<UserViewModel | null>(null);
-  const [isSyncing, setIsSyncing] = useState(true);
+  const [isDbLoading, setIsDbLoading] = useState(false);
   const interceptorsAttached = useRef(false);
 
   useEffect(() => {
@@ -17,37 +23,32 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
       if (authLoading) return;
 
       if (!isAuthenticated) {
-        setIsSyncing(false);
+        setCurrentUser((prev) => (prev !== null ? null : prev));
         return;
       }
 
+      setIsDbLoading(true);
       try {
         if (!interceptorsAttached.current) {
           apiInterceptors(getAccessTokenSilently);
           interceptorsAttached.current = true;
         }
 
-        console.log("Syncing user from DB...");
-        const dbUser = await userApiCalls.getByAuth0Id();
+        const dbUser = await userApiCalls.getByIdentityId();
         setCurrentUser(dbUser);
-        console.log("User synced successfully");
       } catch (err: unknown) {
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 404 && user) {
-            console.log("User not found in DB, creating...");
-            const newUser = await userApiCalls.create({
-              auth0Id: user.sub!,
-              email: user.email!,
-              firstName: user.given_name || user.name || "User",
-            });
-            setCurrentUser(newUser);
-            console.log("New user created and synced");
-          }
+        if (axios.isAxiosError(err) && err.response?.status === 404 && user) {
+          const newUser = await userApiCalls.create({
+            identityId: user.sub!,
+            email: user.email!,
+            firstName: user.given_name || user.name || "User",
+          });
+          setCurrentUser(newUser);
         } else {
-          console.error("An unexpected non-network error occurred:", err);
+          console.error("User sync error:", err);
         }
       } finally {
-        setIsSyncing(false);
+        setIsDbLoading(false);
       }
     };
 
@@ -56,9 +57,9 @@ export function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const contextValue = useMemo(() => ({
     currentUser,
-    isSyncing
-  }), [currentUser, isSyncing]);
-  
+    isSyncing: authLoading || isDbLoading
+  }), [currentUser, authLoading, isDbLoading]);
+
   return (
     <UserContext.Provider value={contextValue}>
       {children}

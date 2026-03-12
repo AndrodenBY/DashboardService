@@ -10,9 +10,9 @@ type SubscriptionListProps = {
 export function SubscriptionList({ subscriptions }: Readonly<SubscriptionListProps>) {
   const navigate = useNavigate();
 
-  const handleCardClick = (id: string) => {
+  const handleCardClick = (id: string) => () => {
     navigate(`/subscriptions/${id}`);
-  }
+  };
 
   return (
     <section className="subscription-list-section">
@@ -20,8 +20,8 @@ export function SubscriptionList({ subscriptions }: Readonly<SubscriptionListPro
         {subscriptions.map((subscription) => (
           <SubscriptionCard
             key={subscription.id}
-            subscriptionInfo={subscription}
-            onClick={() => handleCardClick(subscription.id)}
+            {...subscription}
+            onClick={handleCardClick(subscription.id)}
           />
         ))}
       </Stack>

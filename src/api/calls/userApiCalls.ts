@@ -12,7 +12,7 @@ export const userApiCalls = {
     return data;
   },
 
-  getByAuth0Id: async (): Promise<UserViewModel> => {
+  getByIdentityId: async (): Promise<UserViewModel> => {
     const { data } = await userApi.get<UserViewModel>(`/me`);
     return data;
   },

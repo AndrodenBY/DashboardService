@@ -18,21 +18,23 @@ import {useAuth0} from "@auth0/auth0-react";
 import LogoutButton from "../ui/LogoutButton";
 import LoginButton from "../ui/LoginButton";
 
+const NAV_ITEMS = [
+  { label: 'Dashboard', path: '/' },
+  { label: 'Profile', path: '/profile' },
+];
 
 export function NavigationBar() {
   const { isAuthenticated } = useAuth0();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const navItems = [
-    { label: 'Dashboard', path: '/' },
-    { label: 'Profile', path: '/profile' },
-  ];
+  const handleDrawerOpen = () => setIsDrawerOpen(true);
+  const handleDrawerClose = () => setIsDrawerOpen(false);
 
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
       <MuiAppBar position="static" sx={{ borderRadius: '10px' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
+          <IconButton color="inherit" onClick={handleDrawerOpen}>
             <MenuIcon />
           </IconButton>
 
@@ -46,13 +48,13 @@ export function NavigationBar() {
 
       <SwipeableDrawer
         anchor="top"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onOpen={() => setDrawerOpen(true)}
+        open={isDrawerOpen}
+        onClose={handleDrawerClose}
+        onOpen={handleDrawerOpen}
       >
-        <Box sx={{ width: 'auto' }} onClick={() => setDrawerOpen(false)}>
+        <Box sx={{ width: 'auto' }} onClick={handleDrawerClose}>
           <List>
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <ListItem key={item.label} disablePadding>
                 <ListItemButton component={NavLink} to={item.path}>
                   <ListItemText primary={item.label} sx={{ textAlign: 'center' }} />

@@ -1,28 +1,28 @@
 import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
 
-const DOCKER_URL = 'http://localhost:8080';
-const LOCAL_URL = 'https://localhost:7089';
+const PRIMARY = import.meta.env.VITE_PRIMARY_URL;
+const FAILOVER = import.meta.env.VITE_FAILOVER_URL;
 
-interface RetryConfig extends InternalAxiosRequestConfig {
+type RetryConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 }
 
 export const userApi = axios.create({
-  baseURL: `${DOCKER_URL}/api/users`,
+  baseURL: `${PRIMARY}/api/users`,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 export const groupApi = axios.create({
-  baseURL: `${DOCKER_URL}/api/groups`,
+  baseURL: `${PRIMARY}/api/groups`,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const subscriptionApi = axios.create({
-  baseURL: `${DOCKER_URL}/api/subscriptions`,
+  baseURL: `${PRIMARY}/api/subscriptions`,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -49,7 +49,7 @@ export const apiInterceptors = (getAccessToken: () => Promise<string>) => {
       config._retry = true;
 
       if (config.baseURL) {
-        config.baseURL = config.baseURL.replace(DOCKER_URL, LOCAL_URL);
+        config.baseURL = config.baseURL.replace(PRIMARY, FAILOVER);
       }
 
       console.warn(
