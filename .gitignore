@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 *.env
 *.md
+*.editorconfig
+
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
