@@ -40,9 +40,10 @@ export const subscriptionApiCalls = {
   },
 
   renew: async (subscriptionId: string, monthsToRenew: number): Promise<Subscription> => {
-    const { data } = await subscriptionApi.patch<Subscription>(`/${subscriptionId}/renew`, null, {
-      params: { monthsToRenew },
-    });
+    const { data } = await subscriptionApi.patch<Subscription>(
+      `/${subscriptionId}/renew?monthsToRenew=${monthsToRenew}`,
+      {}
+    );
     return data;
   },
 
