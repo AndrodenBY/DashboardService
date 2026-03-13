@@ -121,7 +121,7 @@ export const SubscriptionDetails = withErrorBoundary(() => {
 
       setSnackbar({
         open: true,
-        message: `Successfully ${updatedData.active ? 'renewed' : 'cancelled'} subscription!`,
+        message: `Subscription ${updatedData.active ? 'renewed' : 'cancelled'}`,
         severity: 'success'
       });
     } catch (err) {
